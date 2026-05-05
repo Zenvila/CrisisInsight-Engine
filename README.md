@@ -13,6 +13,13 @@ The system takes crisis-related text input and produces:
 - Greedy ranking of multiple events by impact score
 - A* based search for the most dangerous combination of up to 3 events
 
+
+### System Architecture
+<img src="architecture.jpg" width="800" alt="Crisis Intelligence Decision Support System Architecture">
+
+
+
+
 ## Saved Models And Artifacts
 
 The application is built around the following saved files in `models/`:
