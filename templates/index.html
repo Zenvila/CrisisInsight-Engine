@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Based Crisis Intelligence & Decision Support System — Analyze, classify, and assess crisis events with machine learning and search algorithms.">
+    <title>Crisis Intelligence — AI Decision Support System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <header id="main-header">
+        <div class="header-content">
+            <div class="logo-group">
+                <div class="logo-icon" id="logo-pulse">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="url(#grad1)" stroke-width="2.5"/>
+                        <path d="M10 16 L14 10 L18 20 L22 14" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs><linearGradient id="grad1" x1="0" y1="0" x2="32" y2="32"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#a29bfe"/></linearGradient></defs>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Crisis Intelligence</h1>
+                    <p class="subtitle">AI-Powered Decision Support System</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="status-dot"></span>
+                <span>System Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════ NAVIGATION ═══════════ -->
+    <nav id="main-nav">
+        <div class="nav-inner">
+            <button class="nav-btn active" data-tab="analyze" id="nav-analyze">
+                <span class="nav-icon">🔍</span><span class="nav-label">Analyze</span>
+            </button>
+            <button class="nav-btn" data-tab="multi" id="nav-multi">
+                <span class="nav-icon">📊</span><span class="nav-label">Multi-Event</span>
+            </button>
+            <button class="nav-btn" data-tab="scenario" id="nav-scenario">
+                <span class="nav-icon">⚡</span><span class="nav-label">Scenario</span>
+            </button>
+            <button class="nav-btn" data-tab="riskpath" id="nav-riskpath">
+                <span class="nav-icon">🧭</span><span class="nav-label">Risk Path</span>
+            </button>
+            <button class="nav-btn" data-tab="compare" id="nav-compare">
+                <span class="nav-icon">🤖</span><span class="nav-label">Models</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <main id="app-main">
+
+        <!-- ─── TAB 1: ANALYZE (Single News) ─── -->
+        <section class="tab-panel active" id="tab-analyze">
+            <div class="section-header">
+                <h2>Analyze News Event</h2>
+                <p>Input a news headline or article to classify the event, predict impact, and assess risk level.</p>
+            </div>
+
+            <div class="analyze-grid">
+                <!-- Input Card -->
+                <div class="glass-card input-card">
+                    <div class="card-header">
+                        <h3>📰 News Input</h3>
+                        <select id="model-select" class="model-selector">
+                            <option value="logistic_regression">Logistic Regression</option>
+                            <option value="neural_network">Neural Network (MLP)</option>
+                        </select>
+                    </div>
+                    <textarea id="single-input" placeholder="Enter a news headline or article...&#10;&#10;Example: Major earthquake strikes coastal city, thousands displaced and infrastructure destroyed" rows="5"></textarea>
+                    <div class="input-actions">
+                        <button class="btn btn-primary" id="btn-analyze" onclick="analyzeSingle()">
+                            <span class="btn-icon">🔍</span> Analyze
+                        </button>
+                        <button class="btn btn-ghost" onclick="loadSample()">
+                            <span class="btn-icon">🎲</span> Try Sample
+                        </button>
+                    </div>
+                    <div class="sample-query-panel">
+                        <div class="sample-query-title">Quick Sample Queries</div>
+                        <div id="sample-query-list" class="sample-query-list"></div>
+                    </div>
+                </div>
+
+                <!-- Results Card -->
+                <div class="glass-card result-card" id="single-result" style="display:none;">
+                    <div class="card-header"><h3>📋 Analysis Results</h3></div>
+                    <div id="single-result-content"></div>
+                </div>
+            </div>
+
+            <!-- Explainability -->
+            <div class="glass-card" id="explain-card" style="display:none;">
+                <div class="card-header"><h3>🧠 Explainability — Why This Prediction?</h3></div>
+                <div id="explain-content"></div>
+            </div>
+        </section>
+
+        <!-- ─── TAB 2: MULTI-EVENT RANKING ─── -->
+        <section class="tab-panel" id="tab-multi">
+            <div class="section-header">
+                <h2>Multi-Event Ranking</h2>
+                <p>Input multiple news events and the system will rank them by priority using Greedy Search.</p>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <h3>📰 News Events</h3>
+                    <div class="header-actions">
+                        <select id="multi-model-select" class="model-selector">
+                            <option value="logistic_regression">Logistic Regression</option>
+                            <option value="neural_network">Neural Network (MLP)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="multi-inputs">
+                    <div class="multi-input-row">
+                        <span class="row-num">1</span>
+                        <input type="text" class="multi-news-input" placeholder="Enter news headline...">
+                        <button class="btn-icon-only btn-remove" onclick="removeMultiInput(this)" title="Remove">✕</button>
+                    </div>
+                    <div class="multi-input-row">
+                        <span class="row-num">2</span>
+                        <input type="text" class="multi-news-input" placeholder="Enter news headline...">
+                        <button class="btn-icon-only btn-remove" onclick="removeMultiInput(this)" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="input-actions">
+                    <button class="btn btn-secondary" onclick="addMultiInput()">
+                        <span class="btn-icon">➕</span> Add Event
+                    </button>
+                    <button class="btn btn-ghost" onclick="loadMultiSamples()">
+                        <span class="btn-icon">🎲</span> Load Samples
+                    </button>
+                    <button class="btn btn-primary" id="btn-rank" onclick="rankEvents()">
+                        <span class="btn-icon">📊</span> Rank Events
+                    </button>
+                </div>
+                <div class="sample-query-panel">
+                    <div class="sample-query-title">Quick Sample Queries</div>
+                    <div id="multi-sample-query-list" class="sample-query-list"></div>
+                </div>
+            </div>
+
+            <!-- Ranking Results -->
+            <div class="glass-card" id="ranking-result" style="display:none;">
+                <div class="card-header"><h3>🏆 Event Ranking (Greedy Search)</h3></div>
+                <div id="ranking-stats" class="stats-row"></div>
+                <div id="ranking-table-wrap"></div>
+            </div>
+
+            <!-- Impact Chart -->
+            <div class="glass-card" id="ranking-chart-card" style="display:none;">
+                <div class="card-header"><h3>📊 Impact Distribution</h3></div>
+                <div class="chart-container"><canvas id="ranking-chart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- ─── TAB 3: SCENARIO SIMULATION ─── -->
+        <section class="tab-panel" id="tab-scenario">
+            <div class="section-header">
+                <h2>Scenario Simulation</h2>
+                <p>"What if these events happen together?" — Analyze compound impact of simultaneous crises.</p>
+            </div>
+
+            <div class="glass-card help-card">
+                <div class="card-header"><h3>❓ Help: How To Use Scenario</h3></div>
+                <ul class="help-list">
+                    <li>Add at least 2 events that could happen at the same time.</li>
+                    <li>Use <strong>Quick Sample Queries</strong> for instant demo-ready scenarios.</li>
+                    <li>Click <strong>Simulate Scenario</strong> to get base score, compound score, and interaction multipliers.</li>
+                    <li>Focus on <strong>Total Multiplier</strong> and <strong>Risk Level</strong> to explain escalation in viva.</li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header"><h3>⚡ Configure Scenario</h3></div>
+                <div id="scenario-inputs">
+                    <div class="multi-input-row">
+                        <span class="row-num">1</span>
+                        <input type="text" class="scenario-news-input" placeholder="Enter crisis event...">
+                        <button class="btn-icon-only btn-remove" onclick="removeScenarioInput(this)" title="Remove">✕</button>
+                    </div>
+                    <div class="multi-input-row">
+                        <span class="row-num">2</span>
+                        <input type="text" class="scenario-news-input" placeholder="Enter crisis event...">
+                        <button class="btn-icon-only btn-remove" onclick="removeScenarioInput(this)" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="input-actions">
+                    <button class="btn btn-secondary" onclick="addScenarioInput()">
+                        <span class="btn-icon">➕</span> Add Event
+                    </button>
+                    <button class="btn btn-ghost" onclick="loadScenarioSamples()">
+                        <span class="btn-icon">🎲</span> Load Samples
+                    </button>
+                    <button class="btn btn-primary" onclick="analyzeScenario()">
+                        <span class="btn-icon">⚡</span> Simulate Scenario
+                    </button>
+                </div>
+                <div class="sample-query-panel">
+                    <div class="sample-query-title">Quick Sample Queries</div>
+                    <div id="scenario-sample-query-list" class="sample-query-list"></div>
+                </div>
+            </div>
+
+            <!-- Scenario Results -->
+            <div class="glass-card" id="scenario-result" style="display:none;">
+                <div class="card-header"><h3>🔥 Scenario Analysis</h3></div>
+                <div id="scenario-content"></div>
+            </div>
+
+            <div class="glass-card" id="scenario-chart-card" style="display:none;">
+                <div class="card-header"><h3>📊 Impact Breakdown</h3></div>
+                <div class="chart-container"><canvas id="scenario-chart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- ─── TAB 4: RISK PATH (A*) ─── -->
+        <section class="tab-panel" id="tab-riskpath">
+            <div class="section-header">
+                <h2>Risk Path Finder</h2>
+                <p>Uses A* Search to find the most dangerous sequence of events — the worst-case cascade.</p>
+            </div>
+
+            <div class="glass-card help-card">
+                <div class="card-header"><h3>❓ Help: How To Use Risk Path</h3></div>
+                <ul class="help-list">
+                    <li>Add at least 2 events in possible order of escalation.</li>
+                    <li>Use <strong>Quick Sample Queries</strong> to demo A* behavior quickly.</li>
+                    <li>Click <strong>Find Risk Path (A*)</strong> to compute the most dangerous progression.</li>
+                    <li>Explain the result using <strong>Nodes Explored</strong>, <strong>Compound Risk</strong>, and path steps.</li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header"><h3>🧭 Configure Events</h3></div>
+                <div id="riskpath-inputs">
+                    <div class="multi-input-row">
+                        <span class="row-num">1</span>
+                        <input type="text" class="riskpath-news-input" placeholder="Enter crisis event...">
+                        <button class="btn-icon-only btn-remove" onclick="removeRiskPathInput(this)" title="Remove">✕</button>
+                    </div>
+                    <div class="multi-input-row">
+                        <span class="row-num">2</span>
+                        <input type="text" class="riskpath-news-input" placeholder="Enter crisis event...">
+                        <button class="btn-icon-only btn-remove" onclick="removeRiskPathInput(this)" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="input-actions">
+                    <button class="btn btn-secondary" onclick="addRiskPathInput()">
+                        <span class="btn-icon">➕</span> Add Event
+                    </button>
+                    <button class="btn btn-ghost" onclick="loadRiskPathSamples()">
+                        <span class="btn-icon">🎲</span> Load Samples
+                    </button>
+                    <button class="btn btn-primary" onclick="findRiskPath()">
+                        <span class="btn-icon">🧭</span> Find Risk Path (A*)
+                    </button>
+                </div>
+                <div class="sample-query-panel">
+                    <div class="sample-query-title">Quick Sample Queries</div>
+                    <div id="riskpath-sample-query-list" class="sample-query-list"></div>
+                </div>
+            </div>
+
+            <!-- Risk Path Results -->
+            <div class="glass-card" id="riskpath-result" style="display:none;">
+                <div class="card-header"><h3>🛤️ Optimal Risk Path (A* Search)</h3></div>
+                <div id="riskpath-content"></div>
+            </div>
+        </section>
+
+        <!-- ─── TAB 5: MODEL COMPARISON ─── -->
+        <section class="tab-panel" id="tab-compare">
+            <div class="section-header">
+                <h2>Model Comparison</h2>
+                <p>Compare the performance of Logistic Regression vs Neural Network (MLP) on classification metrics.</p>
+            </div>
+
+            <div class="compare-grid" id="compare-content">
+                <div class="glass-card loading-card">
+                    <p>Loading model comparison data...</p>
+                </div>
+            </div>
+
+            <div class="glass-card" id="compare-chart-card" style="display:none;">
+                <div class="card-header"><h3>📊 Performance Metrics</h3></div>
+                <div class="chart-container"><canvas id="compare-chart"></canvas></div>
+            </div>
+
+            <div class="glass-card" id="regression-card" style="display:none;">
+                <div class="card-header"><h3>📈 Impact Score Model (Ridge Regression)</h3></div>
+                <div id="regression-content"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════ FOOTER ═══════════ -->
+    <footer id="main-footer">
+        <p>Crisis Intelligence &amp; Decision Support System — AI/ML Project</p>
+    </footer>
+
+    <!-- ═══════════ LOADING OVERLAY ═══════════ -->
+    <div id="loading-overlay" style="display:none;">
+        <div class="spinner"></div>
+        <p>Analyzing...</p>
+    </div>
+
+    <script src="/static/js/animations.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
